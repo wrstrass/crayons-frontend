@@ -1,0 +1,10 @@
+* {
+    margin: 0px;
+    padding: 0px;
+}
+
+div#edit_window_container {
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+}

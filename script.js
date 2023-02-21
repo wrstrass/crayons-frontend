@@ -11,6 +11,10 @@ class Line {
         this.end = end;
     }
 
+    highlight_points() {
+        return [this.begin, this.end];
+    }
+
     draw(context) {
         context.beginPath();
         context.moveTo(this.begin.x, this.begin.y);
@@ -19,11 +23,27 @@ class Line {
     }
 }
 
+eps = 15;
+
+function circle(ctx, x, y, radius = eps) {
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, 2 * Math.PI);
+    ctx.fill();
+}
+
+function distance(A, B) {
+    return Math.sqrt((A.x - B.x) ** 2 + (A.y - B.y) ** 2);
+}
+
 class EditWindow {
     constructor(edit_window) {
         this.edit_window = edit_window;
         this.edit_window_container = this.edit_window.parentNode;
         this.edit_ctx = this.edit_window.getContext("2d");
+
+        this.edit_ctx.fillStyle = "black";
+        this.edit_ctx.strokeStyle = "black";
+
 
         this.elements = [];
 
@@ -43,6 +63,31 @@ class EditWindow {
         return this.click_count == 1;
     }
 
+    highlight_points() {
+        let result = [];
+        this.elements.forEach((el) => {
+            el.highlight_points().forEach((point) => {
+                if (result.indexOf(point) == -1)
+                    result.push(point);
+            });
+        });
+        if (this.first_click())
+            return result.slice(0, -1);
+        return result;
+    }
+
+    find_nearest(point) {
+        let result = null;
+        this.highlight_points().forEach((hpoint) => {
+            if (result === null)
+                if (distance(point, hpoint) <= eps) {
+                    result = hpoint;
+                    return;
+                }
+        });
+        return result;
+    }
+
     clear() {
         this.edit_ctx.clearRect(0, 0, this.edit_window.width, this.edit_window.height);
     }
@@ -50,6 +95,17 @@ class EditWindow {
         this.elements.forEach(element => {
             element.draw(this.edit_ctx);
         });
+    }
+    highlight() {
+        this.edit_ctx.fillStyle = "rgba(0, 0, 255, 0.2)";
+        this.edit_ctx.strokeStyle = "rgba(0, 0, 255, 0.2)";
+
+        this.highlight_points().forEach((point) => {
+            circle(this.edit_ctx, point.x, point.y);
+        });
+
+        this.edit_ctx.fillStyle = "black";
+        this.edit_ctx.strokeStyle = "black";
     }
 
     set_canvas_size() {
@@ -64,13 +120,20 @@ window.onload = function () {
     window.addEventListener("click", (ev) => {
         edit_window.add_click();
         if (edit_window.first_click()) {
+            ev_point = new Point(ev.clientX, ev.clientY)
             edit_window.elements.push(new Line());
-            edit_window.temp_element().begin = new Point(ev.clientX, ev.clientY);
+            edit_window.temp_element().begin = ev_point;
+            if (ev.ctrlKey) {
+                let nearest = edit_window.find_nearest(ev_point);
+                if (nearest !== null)
+                    edit_window.temp_element().begin = nearest;
+            }
         }
     });
     window.addEventListener("mousemove", (ev) => {
         if (edit_window.first_click()) {
-            edit_window.temp_element().end = new Point(ev.clientX, ev.clientY);
+            ev_point = new Point(ev.clientX, ev.clientY);
+            edit_window.temp_element().end = ev_point;
             if (ev.shiftKey) {
                 dx = Math.abs(ev.clientX - edit_window.temp_element().begin.x);
                 dy = Math.abs(ev.clientY - edit_window.temp_element().begin.y);
@@ -81,8 +144,21 @@ window.onload = function () {
                     edit_window.temp_element().end.x = edit_window.temp_element().begin.x;
                 }
             }
+            else if (ev.ctrlKey) {
+                let nearest = edit_window.find_nearest(ev_point);
+                if (nearest !== null)
+                    edit_window.temp_element().end = nearest;
+            }
             edit_window.clear();
             edit_window.draw_all();
+            if (ev.ctrlKey)
+                edit_window.highlight();
+        }
+        else {
+            edit_window.clear();
+            edit_window.draw_all();
+            if (ev.ctrlKey)
+                edit_window.highlight();
         }
     });
 }

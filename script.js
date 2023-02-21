@@ -82,6 +82,16 @@ window.onload = function () {
     window.addEventListener("mousemove", (ev) => {
         if (edit_window.begin_draw()) {
             edit_window.temp_element().set_end(ev.clientX, ev.clientY);
+            if (ev.shiftKey) {
+                dx = Math.abs(ev.clientX - edit_window.temp_element().begin.x);
+                dy = Math.abs(ev.clientY - edit_window.temp_element().begin.y);
+                if (dx > dy) {
+                    edit_window.temp_element().end.y = edit_window.temp_element().begin.y;
+                }
+                else {
+                    edit_window.temp_element().end.x = edit_window.temp_element().begin.x;
+                }
+            }
             edit_window.clear();
             edit_window.draw_all();
         }

@@ -1,17 +1,14 @@
-class Line {
-    constructor() {}
-
-    set_begin(x, y) {
-        this.begin = {
-            x: x,
-            y: y
-        }
+class Point {
+    constructor(x = 0, y = 0) {
+        this.x = x;
+        this.y = y;
     }
-    set_end(x, y) {
-        this.end = {
-            x: x,
-            y: y
-        }
+}
+
+class Line {
+    constructor(begin = new Point(), end = new Point()) {
+        this.begin = begin;
+        this.end = end;
     }
 
     draw(context) {
@@ -33,6 +30,7 @@ class EditWindow {
         this.click_count = 0;
 
         this.set_canvas_size();
+        window.addEventListener("resize", this.set_canvas_size);
     }
 
     temp_element() {
@@ -41,14 +39,8 @@ class EditWindow {
     add_click() {
         this.click_count = (this.click_count + 1) % 2;
     }
-    begin_draw() {
+    first_click() {
         return this.click_count == 1;
-    }
-    begin_coordinates(x, y) {
-        this.coordinates = {
-            x: x,
-            y: y
-        }
     }
 
     clear() {
@@ -57,7 +49,6 @@ class EditWindow {
     draw_all() {
         this.elements.forEach(element => {
             element.draw(this.edit_ctx);
-            console.log("draw" + element);
         });
     }
 
@@ -70,18 +61,16 @@ class EditWindow {
 window.onload = function () {
     let edit_window = new EditWindow(document.getElementById("edit_window"));
 
-    window.addEventListener("resize", edit_window.set_canvas_size);
-
     window.addEventListener("click", (ev) => {
         edit_window.add_click();
-        if (edit_window.begin_draw()) {
+        if (edit_window.first_click()) {
             edit_window.elements.push(new Line());
-            edit_window.temp_element().set_begin(ev.clientX, ev.clientY);
+            edit_window.temp_element().begin = new Point(ev.clientX, ev.clientY);
         }
     });
     window.addEventListener("mousemove", (ev) => {
-        if (edit_window.begin_draw()) {
-            edit_window.temp_element().set_end(ev.clientX, ev.clientY);
+        if (edit_window.first_click()) {
+            edit_window.temp_element().end = new Point(ev.clientX, ev.clientY);
             if (ev.shiftKey) {
                 dx = Math.abs(ev.clientX - edit_window.temp_element().begin.x);
                 dy = Math.abs(ev.clientY - edit_window.temp_element().begin.y);

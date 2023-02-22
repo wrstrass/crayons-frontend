@@ -37,14 +37,13 @@ class EditWindow {
 
     highlight_points() {
         let result = [];
-        this.elements.forEach((el) => {
+        let elements = (this.first_click())? this.elements.slice(0, -1) : this.elements;
+        elements.forEach((el) => {
             el.highlight_points().forEach((point) => {
                 if (result.indexOf(point) == -1)
                     result.push(point);
             });
         });
-        if (this.first_click())
-            return result.slice(0, -1);
         return result;
     }
 
@@ -92,45 +91,50 @@ window.onload = function () {
     edit_window.edit_window.addEventListener("click", (ev) => {
         edit_window.add_click();
         if (edit_window.first_click()) {
-            ev_point = new Point(ev.offsetX, ev.offsetY);
-            edit_window.elements.push(new Line());
-            edit_window.temp_element().begin = ev_point;
-            if (ev.ctrlKey) {
-                let nearest = edit_window.find_nearest(ev_point);
-                if (nearest !== null)
-                    edit_window.temp_element().begin = nearest;
+            let ev_point = new Point(ev.offsetX, ev.offsetY);
+            console.log("ctrl " + ev.ctrlKey);
+            let nearest = (ev.ctrlKey)? edit_window.find_nearest(ev_point) : null;
+            console.log("nearest " + nearest);
+            let result_point = (nearest === null)? ev_point : nearest;
+
+            if (edit_window.draw_mode == "line") {
+                edit_window.elements.push(new Line());
+                edit_window.temp_element().begin = result_point;
+            }
+            else if (edit_window.draw_mode == "rect") {
+                edit_window.elements.push(new Rect());
+                edit_window.temp_element().top_left = result_point;
             }
         }
     });
     edit_window.edit_window.addEventListener("mousemove", (ev) => {
         if (edit_window.first_click()) {
-            ev_point = new Point(ev.offsetX, ev.offsetY);
-            edit_window.temp_element().end = ev_point;
-            if (ev.shiftKey) {
-                dx = Math.abs(ev.clientX - edit_window.temp_element().begin.x);
-                dy = Math.abs(ev.clientY - edit_window.temp_element().begin.y);
-                if (dx > dy) {
-                    edit_window.temp_element().end.y = edit_window.temp_element().begin.y;
-                }
-                else {
-                    edit_window.temp_element().end.x = edit_window.temp_element().begin.x;
+            let ev_point = new Point(ev.offsetX, ev.offsetY);
+            let nearest = (ev.ctrlKey)? edit_window.find_nearest(ev_point) : null;
+            let result_point = (nearest === null)? ev_point : nearest;
+
+            if (edit_window.draw_mode == "line") {
+                edit_window.temp_element().end = result_point;
+
+                if (ev.shiftKey) {
+                    dx = Math.abs(ev.clientX - edit_window.temp_element().begin.x);
+                    dy = Math.abs(ev.clientY - edit_window.temp_element().begin.y);
+                    if (dx > dy) {
+                        edit_window.temp_element().end.y = edit_window.temp_element().begin.y;
+                    }
+                    else {
+                        edit_window.temp_element().end.x = edit_window.temp_element().begin.x;
+                    }
                 }
             }
-            else if (ev.ctrlKey) {
-                let nearest = edit_window.find_nearest(ev_point);
-                if (nearest !== null)
-                    edit_window.temp_element().end = nearest;
+            else if (edit_window.draw_mode == "rect") {
+                edit_window.temp_element().bottom_right = result_point;
             }
-            edit_window.clear();
-            edit_window.draw_all();
-            if (ev.ctrlKey)
-                edit_window.highlight();
         }
-        else {
-            edit_window.clear();
-            edit_window.draw_all();
-            if (ev.ctrlKey)
-                edit_window.highlight();
-        }
+
+        edit_window.clear();
+        edit_window.draw_all();
+        if (ev.ctrlKey)
+            edit_window.highlight();
     });
 }

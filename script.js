@@ -7,6 +7,15 @@ class EditWindow {
         this.edit_ctx.fillStyle = "black";
         this.edit_ctx.strokeStyle = "black";
 
+        this.draw_mode = "line";
+        let draw_buttons = document.getElementsByClassName("draw_mode_button");
+        for (let i = 0; i < draw_buttons.length; i++) {
+            draw_buttons[i].addEventListener("click", (ev) => {
+                document.getElementById("current_mode").id = "";
+                draw_buttons[i].id = "current_mode";
+                this.draw_mode = draw_buttons[i].innerHTML;
+            });
+        }
 
         this.elements = [];
 

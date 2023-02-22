@@ -80,10 +80,10 @@ class EditWindow {
 window.onload = function () {
     let edit_window = new EditWindow(document.getElementById("edit_window"));
 
-    window.addEventListener("click", (ev) => {
+    edit_window.edit_window.addEventListener("click", (ev) => {
         edit_window.add_click();
         if (edit_window.first_click()) {
-            ev_point = new Point(ev.clientX, ev.clientY)
+            ev_point = new Point(ev.offsetX, ev.offsetY);
             edit_window.elements.push(new Line());
             edit_window.temp_element().begin = ev_point;
             if (ev.ctrlKey) {
@@ -93,9 +93,9 @@ window.onload = function () {
             }
         }
     });
-    window.addEventListener("mousemove", (ev) => {
+    edit_window.edit_window.addEventListener("mousemove", (ev) => {
         if (edit_window.first_click()) {
-            ev_point = new Point(ev.clientX, ev.clientY);
+            ev_point = new Point(ev.offsetX, ev.offsetY);
             edit_window.temp_element().end = ev_point;
             if (ev.shiftKey) {
                 dx = Math.abs(ev.clientX - edit_window.temp_element().begin.x);

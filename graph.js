@@ -3,85 +3,105 @@ window.eps = 15;
 
 window.Point = class Point {
     constructor(x = 0, y = 0) {
-        this.x = x;
-        this.y = y;
+        if (x instanceof Point) {
+            this.x = x.x;
+            this.y = x.y;
+        }
+        else {
+            this.x = x;
+            this.y = y;
+        }
     }
 }
 
 window.Line = class Line {
     constructor(begin = new Point(), end = new Point()) {
-        this.begin = begin;
-        this.end = end;
+        this._begin = begin;
+        this._end = end;
+        this.konva_element = new Konva.Line({
+            points: [this._begin.x, this._begin.y, this._end.x, this._end.y],
+            stroke: "black",
+            strokeWidth: 2,
+            draggable: true
+        })
+    }
+
+    begin(point = null) {
+        if (point !== null) {
+            this._begin = new Point(point);
+            this.konva_element.points([this._begin.x, this._begin.y, this._end.x, this._end.y]);
+        }
+        return new Point(this._begin);
+    }
+    end(point = null) {
+        if (point !== null) {
+            this._end = new Point(point);
+            this.konva_element.points([this._begin.x, this._begin.y, this._end.x, this._end.y]);
+        }
+        return new Point(this._end);
     }
 
     highlight_points() {
-        return [this.begin, this.end];
-    }
-
-    draw(context) {
-        context.beginPath();
-        context.moveTo(this.begin.x, this.begin.y);
-        context.lineTo(this.end.x, this.end.y);
-        context.stroke();
+        return [new Point(this._begin), new Point(this._end)];
     }
 }
 
 window.Rect = class Rect {
     constructor(top_left = new Point(), bottom_right = new Point()) {
-        this.top_left = top_left;
-        this.bottom_right = bottom_right;
+        this._top_left = new Point(top_left);
+        this._bottom_right = new Point(bottom_right);
+        this.konva_element = new Konva.Rect({
+            x: top_left.x,
+            y: top_left.y,
+            width: (bottom_right.x - top_left.x),
+            height: (bottom_right.y - top_left.y),
+            stroke: "black",
+            strokeWidth: 2,
+            draggable: true
+        });
+    }
 
-        this.top_right = new Point();
-        this.bottom_left = new Point();
-
-        this.top = new Point();
-        this.right = new Point();
-        this.bottom = new Point();
-        this.left = new Point();
+    top_left(point = null) {
+        if (point !== null) {
+            this._top_left = new Point(point);
+            this.konva_element.x(top_left.x);
+            this.konva_element.y(top_left.y);
+            this.konva_element.width(this._bottom_right.x - this._top_left.x);
+            this.konva_element.height(this._bottom_right.y - this._top_left.y);
+        }
+        return new Point(this._top_left);
+    }
+    bottom_right(point = null) {
+        if (point !== null) {
+            this._bottom_right = new Point(point);
+            this.konva_element.width(this._bottom_right.x - this._top_left.x);
+            this.konva_element.height(this._bottom_right.y - this._top_left.y);
+        }
+        return new Point(this._bottom_right);
     }
 
     highlight_points() {
-        this.top_right.x = this.bottom_right.x;
-        this.top_right.y = this.top_left.y;
+        let top_right = new Point(this._bottom_right.x, this._top_left.y);
+        let bottom_left = new Point(this._top_left.x, this._bottom_right.y);
 
-        this.bottom_left.x = this.top_left.x;
-        this.bottom_left.y = this.bottom_right.y;
-
-        this.top.x = (this.top_left.x + this.top_right.x) / 2;
-        this.top.y = this.top_left.y;
-        this.right.x = this.top_right.x;
-        this.right.y = (this.top_right.y + this.bottom_right.y) / 2;
-        this.bottom.x = (this.bottom_left.x + this.bottom_right.x) / 2;
-        this.bottom.y = this.bottom_right.y;
-        this.left.x = this.top_left.x;
-        this.left.y = (this.top_left.y + this.bottom_left.y) / 2;
+        let top = new Point((this._top_left.x + top_right.x) / 2, this._top_left.y);
+        let right = new Point(top_right.x, (top_right.y + this._bottom_right.y) / 2);
+        let bottom = new Point((bottom_left.x + this._bottom_right.x) / 2, this._bottom_right.y);
+        let left = new Point(this._top_left.x, (this._top_left.y + bottom_left.y) / 2);
 
         return [
-            this.top_left,
-            this.top_right,
-            this.bottom_left,
-            this.bottom_right,
-            this.top,
-            this.right,
-            this.bottom,
-            this.left
+            new Point(this._top_left),
+            top,
+            top_right,
+            right,
+            new Point(this._bottom_right),
+            bottom,
+            bottom_left,
+            left
         ];
     }
-
-    draw(context) {
-        context.beginPath();
-        let width = this.bottom_right.x - this.top_left.x;
-        let height = this.bottom_right.y - this.top_left.y;
-        context.strokeRect(this.top_left.x, this.top_left.y, width, height);
-    }
 }
 
-
-window.circle = function (ctx, x, y, radius = eps) {
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, 2 * Math.PI);
-    ctx.fill();
-}
 
 window.distance = function (A, B) {
     return Math.sqrt((A.x - B.x) ** 2 + (A.y - B.y) ** 2);

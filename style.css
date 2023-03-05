@@ -4,13 +4,6 @@
 }
 
 
-div#edit_window_container {
-    overflow: hidden;
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-}
-
 div#draw_mode:hover {
     cursor: pointer;
 }
@@ -18,6 +11,7 @@ div#draw_mode:hover {
 div#draw_mode {
     display: inline-block;
     position: absolute;
+    top: 0px;
     left: 50%;
     transform: translateX(-50%);
 
@@ -39,4 +33,11 @@ div#draw_mode p {
 
 div#draw_mode p#current_mode {
     background-color: rgba(0, 0, 255, 0.7);
+}
+
+
+div#edit_window {
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
 }

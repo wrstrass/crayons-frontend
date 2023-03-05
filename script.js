@@ -78,7 +78,7 @@ class EditWindow {
     highlight() {
         this._hpoints = [];
         this.highlight_points().forEach((hpoint) => {
-            circle = new Konva.Circle({
+            let circle = new Konva.Circle({
                 x: hpoint.x,
                 y: hpoint.y,
                 radius: eps,

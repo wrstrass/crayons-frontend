@@ -113,6 +113,11 @@ window.onload = function () {
                     new Point(result_point), new Point(result_point)
                 ));
             }
+            else if (edit_window.draw_mode == "arrow") {
+                edit_window.add_element(new Arrow(
+                    new Point(result_point), new Point(result_point)
+                ));
+            }
             else if (edit_window.draw_mode == "rect") {
                 edit_window.add_element(new Rect(
                     new Point(result_point), new Point(result_point)
@@ -121,13 +126,14 @@ window.onload = function () {
         }
         edit_window.add_click();
     });
+
     edit_window._edit_window.addEventListener("mousemove", (ev) => {
         if (edit_window.first_click()) {
             let ev_point = new Point(ev.offsetX, ev.offsetY);
             let nearest = (ev.ctrlKey)? edit_window.find_nearest(ev_point) : null;
             let result_point = (nearest === null)? ev_point : nearest;
 
-            if (edit_window.draw_mode == "line") {
+            if (edit_window.draw_mode == "line" || edit_window.draw_mode == "arrow") {
                 edit_window.temp_element().end(result_point);
 
                 if (ev.shiftKey) {

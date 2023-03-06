@@ -14,14 +14,10 @@ window.Point = class Point {
     }
 }
 
-window.Line = class Line {
-    constructor(begin = new Point(), end = new Point()) {
-        this.konva_element = new Konva.Line({
-            points: [begin.x, begin.y, end.x, end.y],
-            stroke: "black",
-            strokeWidth: 2,
-            draggable: true
-        });
+
+window.BaseLine = class BaseLine {
+    constructor(konva_element) {
+        this.konva_element = konva_element;
 
         this.konva_element.on("dragmove", (ev) => {
             let points = this.konva_element.points();
@@ -57,6 +53,34 @@ window.Line = class Line {
         return [this.begin(), this.end()];
     }
 }
+
+
+window.Line = class Line extends BaseLine {
+    constructor(begin = new Point(), end = new Point()) {
+        super(new Konva.Line({
+            points: [begin.x, begin.y, end.x, end.y],
+            stroke: "black",
+            strokeWidth: 2,
+            draggable: true
+        }));
+    }
+}
+
+
+window.Arrow = class Arrow extends BaseLine {
+    constructor(begin = new Point(), end = new Point()) {
+        super(new Konva.Arrow({
+            points: [begin.x, begin.y, end.x, end.y],
+            pointerLength: 10,
+            pointerWidth: 10,
+            fill: "black",
+            stroke: "black",
+            strokeWidth: 2,
+            draggable: true
+        }));
+    }
+}
+
 
 window.Rect = class Rect {
     constructor(top_left = new Point(), bottom_right = new Point()) {

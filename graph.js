@@ -15,18 +15,75 @@ window.Point = class Point {
 }
 
 
-window.BaseLine = class BaseLine {
-    constructor(konva_element) {
+class Shape {
+    constructor(konva_element, edit_window) {
         this.konva_element = konva_element;
+        this._edit_window = edit_window;
 
+        this.konva_element.on("click", (ev) => {
+            this._edit_window.activate(this);
+        });
+        this.konva_element.on("dragstart", (ev) => {
+            this._edit_window.activate(this);
+        });
+    }
+
+    highlight(bool_flag) {
+        if (bool_flag) {
+            this.konva_element.shadowColor("blue");
+            this.konva_element.shadowBlur(7);
+            this.konva_element.shadowOffset({x: 0, y: 0});
+            this.konva_element.shadowOpacity(1);
+        }
+        else {
+            this.konva_element.shadowOpacity(0);
+        }
+    }
+
+    highlight_points() {
+        throw Error("Not Implemented");
+    }
+}
+
+
+class BaseLine extends Shape {
+    constructor(konva_element, edit_window) {
+        super(konva_element, edit_window);
+
+        this.konva_element.on("dragstart", (ev) => {
+            let mouse = new Point(ev.evt.x, ev.evt.y);
+            if (distance(mouse, this.begin()) <= eps) {
+                this._drag_type = 1;
+            }
+            else if (distance(mouse, this.end()) <= eps) {
+                this._drag_type = 2;
+            }
+            else {
+                this._drag_type = 3;
+            }
+        });
         this.konva_element.on("dragmove", (ev) => {
-            let points = this.konva_element.points();
-            this.konva_element.points([
-                points[0] + ev.evt.movementX,
-                points[1] + ev.evt.movementY,
-                points[2] + ev.evt.movementX,
-                points[3] + ev.evt.movementY
-            ]);
+            if (this._drag_type == 3) {
+                let points = this.konva_element.points();
+                this.konva_element.points([
+                    points[0] + ev.evt.movementX,
+                    points[1] + ev.evt.movementY,
+                    points[2] + ev.evt.movementX,
+                    points[3] + ev.evt.movementY
+                ]);
+            }
+            else {
+                let mouse = new Point(ev.evt.x, ev.evt.y);
+                let nearest = (ev.evt.ctrlKey)? this._edit_window.find_nearest(mouse) : null;
+                let result_point = (nearest === null)? mouse : nearest;
+
+                if (this._drag_type == 1) {
+                    this.begin(result_point);
+                }
+                else if (this._drag_type == 2) {
+                    this.end(result_point);
+                }
+            }
             this.konva_element.x(0);
             this.konva_element.y(0);
         });
@@ -56,18 +113,18 @@ window.BaseLine = class BaseLine {
 
 
 window.Line = class Line extends BaseLine {
-    constructor(begin = new Point(), end = new Point()) {
+    constructor(edit_window, begin = new Point(), end = new Point()) {
         super(new Konva.Line({
             points: [begin.x, begin.y, end.x, end.y],
             stroke: "black",
             strokeWidth: 2
-        }));
+        }), edit_window);
     }
 }
 
 
 window.Arrow = class Arrow extends BaseLine {
-    constructor(begin = new Point(), end = new Point()) {
+    constructor(edit_window, begin = new Point(), end = new Point()) {
         super(new Konva.Arrow({
             points: [begin.x, begin.y, end.x, end.y],
             pointerLength: 10,
@@ -75,21 +132,21 @@ window.Arrow = class Arrow extends BaseLine {
             fill: "black",
             stroke: "black",
             strokeWidth: 2
-        }));
+        }), edit_window);
     }
 }
 
 
-window.Rect = class Rect {
-    constructor(top_left = new Point(), bottom_right = new Point()) {
-        this.konva_element = new Konva.Rect({
+window.Rect = class Rect extends Shape {
+    constructor(edit_window, top_left = new Point(), bottom_right = new Point()) {
+        super(new Konva.Rect({
             x: top_left.x,
             y: top_left.y,
             width: (bottom_right.x - top_left.x),
             height: (bottom_right.y - top_left.y),
             stroke: "black",
             strokeWidth: 2
-        });
+        }), edit_window);
     }
 
     top_left(point = null) {

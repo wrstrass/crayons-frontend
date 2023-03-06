@@ -18,13 +18,17 @@ class EditWindow {
                 draw_buttons[i].id = "current_mode";
 
                 this.draw_mode = draw_buttons[i].innerHTML;
-                if (this.draw_mode == "drag") this.drag(true);
+                if (this.draw_mode == "drag") {
+                    this.drag(true);
+                    this.activate(null);
+                }
                 else this.drag(false);
             });
         }
 
         this._elements = [];
         this._hpoints = [];
+        this._active_element = null;
 
         this._click_count = 0;
 
@@ -34,9 +38,6 @@ class EditWindow {
         });
     }
 
-    temp_element() {
-        return this._elements[this._elements.length - 1];
-    }
     add_click() {
         this._click_count = (this._click_count + 1) % 2;
     }
@@ -44,9 +45,20 @@ class EditWindow {
         return this._click_count == 1;
     }
 
+    get_active_element() {
+        return this._active_element;
+    }
+    activate(obj = null) {
+        this._elements.forEach((el) => {
+            el.highlight(false);
+        });
+        if (obj !== null) obj.highlight(true);
+        this._active_element = obj;
+    }
     add_element(el) {
         this._elements.push(el);
         this._konva_layer.add(el.konva_element);
+        this.activate(el);
     }
 
     drag(bool_flag) {
@@ -57,8 +69,12 @@ class EditWindow {
 
 
     highlight_points() {
+        let elements = this._elements.slice();
+        if (this.get_active_element() !== null) {
+            elements.splice(elements.indexOf(this.get_active_element()), 1);
+        }
+
         let result = [];
-        let elements = (this.first_click())? this._elements.slice(0, -1) : this._elements;
         elements.forEach((el) => {
             el.highlight_points().forEach((point) => {
                 let found = false;
@@ -119,17 +135,17 @@ window.onload = function () {
 
             if (edit_window.draw_mode == "line") {
                 edit_window.add_element(new Line(
-                    new Point(result_point), new Point(result_point)
+                    edit_window, new Point(result_point), new Point(result_point)
                 ));
             }
             else if (edit_window.draw_mode == "arrow") {
                 edit_window.add_element(new Arrow(
-                    new Point(result_point), new Point(result_point)
+                    edit_window, new Point(result_point), new Point(result_point)
                 ));
             }
             else if (edit_window.draw_mode == "rect") {
                 edit_window.add_element(new Rect(
-                    new Point(result_point), new Point(result_point)
+                    edit_window, new Point(result_point), new Point(result_point)
                 ));
             }
         }
@@ -143,24 +159,24 @@ window.onload = function () {
             let result_point = (nearest === null)? ev_point : nearest;
 
             if (edit_window.draw_mode == "line" || edit_window.draw_mode == "arrow") {
-                edit_window.temp_element().end(result_point);
+                edit_window.get_active_element().end(result_point);
 
                 if (ev.shiftKey) {
-                    dx = Math.abs(ev.clientX - edit_window.temp_element().begin().x);
-                    dy = Math.abs(ev.clientY - edit_window.temp_element().begin().y);
+                    dx = Math.abs(ev.clientX - edit_window.get_active_element().begin().x);
+                    dy = Math.abs(ev.clientY - edit_window.get_active_element().begin().y);
 
-                    point = edit_window.temp_element().end();
+                    point = edit_window.get_active_element().end();
                     if (dx > dy) {
-                        point.y = edit_window.temp_element().begin().y;
+                        point.y = edit_window.get_active_element().begin().y;
                     }
                     else {
-                        point.x = edit_window.temp_element().begin().x;
+                        point.x = edit_window.get_active_element().begin().x;
                     }
-                    edit_window.temp_element().end(point);
+                    edit_window.get_active_element().end(point);
                 }
             }
             else if (edit_window.draw_mode == "rect") {
-                edit_window.temp_element().bottom_right(result_point);
+                edit_window.get_active_element().bottom_right(result_point);
             }
         }
 

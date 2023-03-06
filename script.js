@@ -16,7 +16,10 @@ class EditWindow {
             draw_buttons[i].addEventListener("click", (ev) => {
                 document.getElementById("current_mode").id = "";
                 draw_buttons[i].id = "current_mode";
+
                 this.draw_mode = draw_buttons[i].innerHTML;
+                if (this.draw_mode == "drag") this.drag(true);
+                else this.drag(false);
             });
         }
 
@@ -46,6 +49,12 @@ class EditWindow {
         this._konva_layer.add(el.konva_element);
     }
 
+    drag(bool_flag) {
+        this._elements.forEach((el) => {
+            el.konva_element.draggable(bool_flag);
+        });
+    }
+
 
     highlight_points() {
         let result = [];
@@ -62,7 +71,6 @@ class EditWindow {
         });
         return result;
     }
-
     find_nearest(point) {
         let result = null;
         this.highlight_points().forEach((hpoint) => {
@@ -90,7 +98,6 @@ class EditWindow {
             this._hpoints.push(circle);
         });
     }
-
     remove_highlight() {
         this._hpoints.forEach((hpoint) => {
             hpoint.destroy();
@@ -103,6 +110,8 @@ window.onload = function () {
     let edit_window = new EditWindow(document.getElementById("edit_window"));
 
     edit_window._edit_window.addEventListener("click", (ev) => {
+        if (edit_window.draw_mode == "drag") return;
+
         if (!edit_window.first_click()) {
             let ev_point = new Point(ev.offsetX, ev.offsetY);
             let nearest = (ev.ctrlKey)? edit_window.find_nearest(ev_point) : null;

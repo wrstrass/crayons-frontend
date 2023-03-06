@@ -60,8 +60,7 @@ window.Line = class Line extends BaseLine {
         super(new Konva.Line({
             points: [begin.x, begin.y, end.x, end.y],
             stroke: "black",
-            strokeWidth: 2,
-            draggable: true
+            strokeWidth: 2
         }));
     }
 }
@@ -75,8 +74,7 @@ window.Arrow = class Arrow extends BaseLine {
             pointerWidth: 10,
             fill: "black",
             stroke: "black",
-            strokeWidth: 2,
-            draggable: true
+            strokeWidth: 2
         }));
     }
 }
@@ -90,8 +88,7 @@ window.Rect = class Rect {
             width: (bottom_right.x - top_left.x),
             height: (bottom_right.y - top_left.y),
             stroke: "black",
-            strokeWidth: 2,
-            draggable: true
+            strokeWidth: 2
         });
     }
 

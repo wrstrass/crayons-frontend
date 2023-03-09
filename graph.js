@@ -51,7 +51,7 @@ class BaseLine extends Shape {
         super(konva_element, edit_window);
 
         this.konva_element.on("dragstart", (ev) => {
-            let mouse = new Point(ev.evt.x, ev.evt.y);
+            let mouse = new Point(ev.evt.offsetX, ev.evt.offsetY);
             if (distance(mouse, this.begin()) <= eps) {
                 this._drag_type = 1;
             }
@@ -73,7 +73,7 @@ class BaseLine extends Shape {
                 ]);
             }
             else {
-                let mouse = new Point(ev.evt.x, ev.evt.y);
+                let mouse = new Point(ev.evt.offsetX, ev.evt.offsetY);
                 let nearest = (ev.evt.ctrlKey)? this._edit_window.find_nearest(mouse) : null;
                 let result_point = (nearest === null)? mouse : nearest;
 

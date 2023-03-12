@@ -1,7 +1,8 @@
-window.HtmlLine = class HtmlLine {
-    constructor(begin_x = 0, begin_y = 0, end_x = 0, end_y = 0) {
+class BaseHTMLLine {
+    constructor(type, begin_x = 0, begin_y = 0, end_x = 0, end_y = 0) {
         this.container = document.createElement("div");
-        this.container.innerHTML = "<h1>Line</h1>";
+        this.container.classList.add(type);
+        this.container.innerHTML = "<h1>" + type + "</h1>";
 
         this.begin = document.createElement("p");
         this.begin.classList.add("begin");
@@ -50,5 +51,18 @@ window.HtmlLine = class HtmlLine {
 
     set_shape(shape) {
         this.shape = shape;
+    }
+}
+
+
+window.HTMLLine = class HTMLLine extends BaseHTMLLine {
+    constructor (begin_x = 0, begin_y = 0, end_x = 0, end_y = 0) {
+        super("Line", begin_x, begin_y, end_x, end_y);
+    }
+}
+
+window.HTMLArrow = class HTMLArrow extends BaseHTMLLine {
+    constructor (begin_x = 0, begin_y = 0, end_x = 0, end_y = 0) {
+        super("Arrow", begin_x, begin_y, end_x, end_y);
     }
 }

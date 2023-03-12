@@ -118,7 +118,7 @@ window.Line = class Line extends BaseLine {
             points: [begin.x, begin.y, end.x, end.y],
             stroke: "black",
             strokeWidth: 2
-        }), new HtmlLine(begin.x, begin.y, end.x, end.y));
+        }), new HTMLLine(begin.x, begin.y, end.x, end.y));
     }
 }
 
@@ -132,7 +132,7 @@ window.Arrow = class Arrow extends BaseLine {
             fill: "black",
             stroke: "black",
             strokeWidth: 2
-        }));
+        }), new HTMLArrow(begin.x, begin.y, end.x, end.y));
     }
 }
 

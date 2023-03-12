@@ -32,6 +32,14 @@ class BaseHTMLLine {
                 ));
             })
         });
+
+        this.container.addEventListener("click", () => {
+            this.shape.activate();
+        });
+    }
+
+    set_shape(shape) {
+        this.shape = shape;
     }
 
     set_points(begin_x, begin_y, end_x, end_y) {
@@ -49,8 +57,13 @@ class BaseHTMLLine {
         this.end_y.value = y;
     }
 
-    set_shape(shape) {
-        this.shape = shape;
+    highlight(bool_flag) {
+        if (bool_flag) {
+            this.container.id = "active_shape";
+        }
+        else {
+            this.container.id = "";
+        }
     }
 }
 

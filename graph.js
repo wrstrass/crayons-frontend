@@ -23,11 +23,15 @@ class Shape {
         this.html_shape.set_shape(this);
 
         this.konva_element.on("click", (ev) => {
-            this._edit_window.activate(this);
+            this.activate();
         });
         this.konva_element.on("dragstart", (ev) => {
-            this._edit_window.activate(this);
+            this.activate();
         });
+    }
+
+    activate() {
+        this._edit_window.activate(this);
     }
 
     highlight(bool_flag) {
@@ -36,9 +40,11 @@ class Shape {
             this.konva_element.shadowBlur(7);
             this.konva_element.shadowOffset({x: 0, y: 0});
             this.konva_element.shadowOpacity(1);
+            this.html_shape.highlight(true);
         }
         else {
             this.konva_element.shadowOpacity(0);
+            this.html_shape.highlight(false);
         }
     }
 

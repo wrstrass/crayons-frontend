@@ -34,6 +34,10 @@ div#shapes_list div h1 {
     text-align: left;
 }
 
+div#active_shape {
+    background-color: rgba(0, 0, 255, 0.3);
+}
+
 
 div#edit_window_container {
     position: relative;

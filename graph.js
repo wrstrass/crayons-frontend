@@ -16,9 +16,11 @@ window.Point = class Point {
 
 
 class Shape {
-    constructor(konva_element, edit_window) {
-        this.konva_element = konva_element;
+    constructor(edit_window, konva_element, html_shape) {
         this._edit_window = edit_window;
+        this.konva_element = konva_element;
+        this.html_shape = html_shape;
+        this.html_shape.set_shape(this);
 
         this.konva_element.on("click", (ev) => {
             this._edit_window.activate(this);
@@ -47,8 +49,8 @@ class Shape {
 
 
 class BaseLine extends Shape {
-    constructor(konva_element, edit_window) {
-        super(konva_element, edit_window);
+    constructor(edit_window, konva_element, html_shape) {
+        super(edit_window, konva_element, html_shape);
 
         this.konva_element.on("dragstart", (ev) => {
             let mouse = new Point(ev.evt.offsetX, ev.evt.offsetY);
@@ -65,12 +67,8 @@ class BaseLine extends Shape {
         this.konva_element.on("dragmove", (ev) => {
             if (this._drag_type == 3) {
                 let points = this.konva_element.points();
-                this.konva_element.points([
-                    points[0] + ev.evt.movementX,
-                    points[1] + ev.evt.movementY,
-                    points[2] + ev.evt.movementX,
-                    points[3] + ev.evt.movementY
-                ]);
+                this.begin(new Point(points[0] + ev.evt.movementX, points[1] + ev.evt.movementY));
+                this.end(new Point(points[2] + ev.evt.movementX, points[3] + ev.evt.movementY));
             }
             else {
                 let mouse = new Point(ev.evt.offsetX, ev.evt.offsetY);
@@ -93,6 +91,7 @@ class BaseLine extends Shape {
         if (point !== null) {
             let end = this.end();
             this.konva_element.points([point.x, point.y, end.x, end.y]);
+            this.html_shape.set_points(point.x, point.y, end.x, end.y);
         }
         let begin = this.konva_element.points().slice(0, 2);
         return new Point(begin[0], begin[1]);
@@ -101,6 +100,7 @@ class BaseLine extends Shape {
         if (point !== null) {
             let begin = this.begin();
             this.konva_element.points([begin.x, begin.y, point.x, point.y]);
+            this.html_shape.set_points(begin.x, begin.y, point.x, point.y);
         }
         let end = this.konva_element.points().slice(2);
         return new Point(end[0], end[1]);
@@ -114,39 +114,39 @@ class BaseLine extends Shape {
 
 window.Line = class Line extends BaseLine {
     constructor(edit_window, begin = new Point(), end = new Point()) {
-        super(new Konva.Line({
+        super(edit_window, new Konva.Line({
             points: [begin.x, begin.y, end.x, end.y],
             stroke: "black",
             strokeWidth: 2
-        }), edit_window);
+        }), new HtmlLine(begin.x, begin.y, end.x, end.y));
     }
 }
 
 
 window.Arrow = class Arrow extends BaseLine {
     constructor(edit_window, begin = new Point(), end = new Point()) {
-        super(new Konva.Arrow({
+        super(edit_window, new Konva.Arrow({
             points: [begin.x, begin.y, end.x, end.y],
             pointerLength: 10,
             pointerWidth: 10,
             fill: "black",
             stroke: "black",
             strokeWidth: 2
-        }), edit_window);
+        }));
     }
 }
 
 
 window.Rect = class Rect extends Shape {
     constructor(edit_window, top_left = new Point(), bottom_right = new Point()) {
-        super(new Konva.Rect({
+        super(edit_window, new Konva.Rect({
             x: top_left.x,
             y: top_left.y,
             width: (bottom_right.x - top_left.x),
             height: (bottom_right.y - top_left.y),
             stroke: "black",
             strokeWidth: 2
-        }), edit_window);
+        }));
     }
 
     top_left(point = null) {

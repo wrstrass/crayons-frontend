@@ -23,6 +23,17 @@ div#shapes_list_container h1 {
     text-align: center;
 }
 
+div#shapes_list div {
+    border-bottom: 1px solid black;
+    padding: 5px;
+}
+
+div#shapes_list div h1 {
+    border: none;
+    font-size: 22px;
+    text-align: left;
+}
+
 
 div#edit_window_container {
     position: relative;

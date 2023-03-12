@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
     <script src="https://unpkg.com/konva@8/konva.min.js"></script>
+    <script src="htmlShapes.js"></script>
     <script src="graph.js"></script>
     <script src="script.js"></script>
     <title>Crayons</title>
@@ -15,7 +16,13 @@
     <div id="UI-container">
         <div id="shapes_list_container">
             <h1>Shapes</h1>
-            <div id="shapes_list"></div>
+            <div id="shapes_list">
+                <!-- <div class="line">
+                    <h1>Line</h1>
+                    <p class="begin">Begin: x <input type="text" class="x"> y <input type="text" class="y"></p>
+                    <p class="end">End: x <input type="text" class="x"> y <input type="text" class="y"></p>
+                </div> -->
+            </div>
         </div>
         <div id="edit_window_container">
             <div id="edit_window"></div>

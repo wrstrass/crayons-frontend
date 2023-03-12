@@ -1,6 +1,7 @@
 class EditWindow {
-    constructor(edit_window) {
+    constructor(edit_window, shapes_list) {
         this._edit_window = edit_window;
+        this._shapes_list = shapes_list;
 
         this._konva_stage = new Konva.Stage({
             container: this._edit_window.id,
@@ -58,6 +59,7 @@ class EditWindow {
     add_element(el) {
         this._elements.push(el);
         this._konva_layer.add(el.konva_element);
+        this._shapes_list.appendChild(el.html_shape.container);
         this.activate(el);
     }
 
@@ -123,7 +125,10 @@ class EditWindow {
 };
 
 window.onload = function () {
-    let edit_window = new EditWindow(document.getElementById("edit_window"));
+    let edit_window = new EditWindow(
+        document.getElementById("edit_window"),
+        document.getElementById("shapes_list"),
+    );
 
     edit_window._edit_window.addEventListener("click", (ev) => {
         if (edit_window.draw_mode == "drag") return;
